@@ -1,0 +1,161 @@
+openapi: 3.0.0
+info:
+  title: Hasan Medics App API
+  version: 1.0.0
+  description: API documentation for the Hasan Medics App
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+
+paths:
+  /api/auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: User registered
+        '400':
+          description: Email already exists
+
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login an existing user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+        '400':
+          description: Invalid credentials
+
+  /api/bookings:
+    get:
+      tags:
+        - Bookings
+      summary: Get logged-in user's bookings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: Unauthorized
+
+    post:
+      tags:
+        - Bookings
+      summary: Create a booking
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service:
+                  type: string
+                date:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Booking created
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /api/bookings/{id}:
+    put:
+      summary: Update a booking
+      description: Allows a user or admin to update a specific booking
+      tags:
+        - Bookings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Booking ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service:
+                  type: string
+                  example: "Consultation"
+                date:
+                  type: string
+                  format: date-time
+                  example: "2025-06-15T10:00:00Z"
+      responses:
+        '200':
+          description: Booking updated successfully
+        '403':
+          description: Not authorized to update this booking
+        '404':
+          description: Booking not found
+
+    delete:
+      summary: Delete a booking
+      description: Allows a user or admin to delete a specific booking
+      tags:
+        - Bookings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Booking ID
+      responses:
+        '200':
+          description: Booking deleted successfully
+        '403':
+          description: Not authorized to delete this booking
+        '404':
+          description: Booking not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
