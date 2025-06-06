@@ -2,6 +2,9 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const sendEmail = require('../utils/sendEmail');
+
+
 // Generate JWT
 const generateToken = (user) => {
   return jwt.sign(
@@ -22,6 +25,12 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({ name, email, password: hashedPassword });
+    // After user.save()
+    await sendEmail(
+      user.email,
+      'Welcome to Hasan Medics!',
+      `<h1>Hi ${user.name},</h1><p>Thanks for registering at Hasan Medics.</p>`
+    );
 
     const token = generateToken(user);
     res.status(201).json({ user: { id: user._id, name, email }, token });

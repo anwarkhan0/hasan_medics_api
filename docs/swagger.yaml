@@ -190,6 +190,42 @@ paths:
         '401':
           description: Unauthorized
 
+  /api/upload:
+    post:
+      tags:
+        - Upload
+      summary: Upload a file (image or PDF)
+      description: Upload a file such as a profile picture or prescription. Only images (JPG, JPEG, PNG) and PDF files are allowed.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: File uploaded successfully
+                  filePath:
+                    type: string
+                    example: /uploads/file-1685555555.jpg
+        '400':
+          description: Bad request (unsupported file type or size too large)
+        '500':
+          description: Server error
+
+
 
 components:
   securitySchemes:
